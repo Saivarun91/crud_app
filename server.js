@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
 const app = express();
+const port = 3000;
 
 // Middleware
 app.use(bodyParser.json());
@@ -17,7 +18,8 @@ mongoose.connect('mongodb://localhost:27017/crud-app', {
 const userSchema = new mongoose.Schema({
     name: String,
     email: String,
-    age: Number
+    age: Number,
+    password: String
 });
 
 const User = mongoose.model('User', userSchema);
@@ -85,10 +87,28 @@ app.delete('/users/:id', async (req, res) => {
     }
 });
 
+// LOGIN
+app.post('/login', (req, res) => {
+    const { email, password } = req.body;
+    // Insert login logic here (e.g., check credentials in the database)
+    res.status(200).send('Login successful');
+});
+
+// SIGNUP
+app.post('/signup', async (req, res) => {
+    const { name, email, age, password } = req.body;
+    try {
+        const user = new User({ name, email, age, password });
+        await user.save();
+        res.status(200).send('Signup successful');
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
 // Start server
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
 });
 
 
